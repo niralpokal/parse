@@ -11,9 +11,38 @@ let parsePages = () => {
 }
 
 let pages = parsePages();
-pages[0].forEach((item)=>{
-   console.log(item.text);
-});
-console.log(pages.length)
+let groups = [];
+let first = pages[0].shift();
+first.row = getRow(first);
+let second = undefined;
+pages[0].forEach((obj)=>{
+    obj.row = getRow(obj)
+    if (obj.row == first.row) {
+        if(second == undefined) second = obj;
+        else if(second.row == obj.row){
+        let group = [];
+        group.push(first, second, obj);
+        groups.push(group);
+        second = undefined;
+        }
+    } else {
+        first = obj;
+        second = undefined;
+    }
+})
+
+
+function getRow(item){
+    const matrix = item.matrix;
+    return matrix.pop();
+}
+groups.forEach((group)=>{
+    let text ='';
+    group.forEach((item)=>{
+        text = text + item.text + ' ';
+    })
+    console.log(text); 
+})
+
 
 
