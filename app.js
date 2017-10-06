@@ -9,11 +9,13 @@ let parsePages = () => {
     let pagesPlacements = extractText(pdfReader);
     return pagesPlacements;
 }
+
 let pages = [];
 let parsedPages = parsePages();
+
 parsedPages.forEach((page, pageIndex) => {
     let groups = [];
-    if(page.length >0){
+    if(page.length > 0){
         let first = page.shift();
         first.row = getRow(first);
         let second = undefined;
@@ -44,9 +46,19 @@ parsedPages.forEach((page, pageIndex) => {
     }
 })
 
-
 function getRow(item){
     const matrix = item.matrix;
     return matrix.pop();
 }
-console.log(pages);
+
+let purchases = [];
+pages.forEach(page => {
+    let filtered = page.groups.filter((item, index, arr) =>{
+        let text = item[0].text;
+        let filter = (text.length != 5) ? false : true;
+        return filter; 
+    })
+    if(filtered.length > 0) purchases.push(filtered);
+})
+
+console.log(purchases);
