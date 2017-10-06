@@ -60,5 +60,18 @@ pages.forEach(page => {
     })
     if(filtered.length > 0) purchases.push(filtered);
 })
-
-console.log(purchases);
+let newYorkPurchases = [];
+let amazonPurchases = [];
+purchases.forEach(page => {
+    let newYork = page.filter(items =>{
+        let location = items[1].text;
+        return (location.indexOf(' NY') != -1) ? true : false;
+    })
+    let amazon = page.filter(items => {
+        let location = items[1].text;
+        return (location.indexOf('AMAZON') != -1) ? true : false;
+    })
+    newYorkPurchases.push(newYork);
+    amazonPurchases.push(amazon);
+})
+console.log(newYorkPurchases)
