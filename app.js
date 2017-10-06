@@ -9,25 +9,38 @@ let parsePages = () => {
     let pagesPlacements = extractText(pdfReader);
     return pagesPlacements;
 }
-
-let pages = parsePages();
-let groups = [];
-let first = pages[0].shift();
-first.row = getRow(first);
-let second = undefined;
-pages[0].forEach((obj)=>{
-    obj.row = getRow(obj)
-    if (obj.row == first.row) {
-        if(second == undefined) second = obj;
-        else if(second.row == obj.row){
-        let group = [];
-        group.push(first, second, obj);
-        groups.push(group);
-        second = undefined;
+let pages = [];
+let parsedPages = parsePages();
+parsedPages.forEach((page, pageIndex) => {
+    let groups = [];
+    if(page.length >0){
+        let first = page.shift();
+        first.row = getRow(first);
+        let second = undefined;
+        page.forEach((item)=>{
+            if(item) {
+                item.row = getRow(item)
+                if (item.row == first.row) {
+                    if(second == undefined) second = item;
+                    else if(second.row == item.row){
+                        let group = [];
+                        group.push(first, second, item);
+                        groups.push(group);
+                        second = undefined;
+                    }
+                } else {
+                    first = item;
+                    second = undefined;
+                }
+            }
+        })
+        if (groups.length > 0){
+            let item = {
+                page: pageIndex,
+                groups
+            };
+            pages.push(item)
         }
-    } else {
-        first = obj;
-        second = undefined;
     }
 })
 
@@ -36,13 +49,4 @@ function getRow(item){
     const matrix = item.matrix;
     return matrix.pop();
 }
-groups.forEach((group)=>{
-    let text ='';
-    group.forEach((item)=>{
-        text = text + item.text + ' ';
-    })
-    console.log(text); 
-})
-
-
-
+console.log(pages);
