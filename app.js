@@ -74,4 +74,30 @@ purchases.forEach(page => {
     newYorkPurchases.push(newYork);
     amazonPurchases.push(amazon);
 })
-console.log(newYorkPurchases)
+
+let newYorkCost = 0;
+let amazonCost = 0;
+newYorkPurchases.forEach(page => {
+    page.forEach(items =>{
+        const date = items[0].text;
+        const loc = items[1].text;
+        const cost = Number(items[2].text);
+        console.log(`${date}  ${loc}  ${cost}`);
+        newYorkCost += cost;
+    })
+})
+
+amazonPurchases.forEach(page => {
+    page.forEach(items =>{
+        const date = items[0].text;
+        const loc = items[1].text;
+        const cost = Number(items[2].text);
+        console.log(`${date}  ${loc}  ${cost}`);
+        amazonCost += cost;
+    })
+})
+
+console.log(`New York Cost: ${newYorkCost.toFixed(2)}`);
+console.log(`Amazon Purchases: ${amazonCost.toFixed(2)}`)
+let totalCost = newYorkCost + amazonCost;
+console.log(`Total Cost: ${totalCost.toFixed(2)}`)
