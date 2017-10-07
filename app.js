@@ -9,12 +9,12 @@ let pdfs = ['jan', 'feb', 'march', 'april', 'may', 'june', 'july', 'august', 'se
 
 let parsePages = (pdf) => {
     let fileToRun = `./input/${pdf}.pdf`;
-    console.log(fileToRun);
     let pdfReader = hummus.createReader(fileToRun);
     let pagesPlacements = extractText(pdfReader);
     return pagesPlacements;
 }
-let month = pdfs[8]
+
+let month = pdfs[7]
 let pages = [];
 let parsedPages = parsePages(month);
 
@@ -65,44 +65,57 @@ pages.forEach(page => {
     })
     if(filtered.length > 0) purchases.push(filtered);
 })
-let newYorkPurchases = [];
-let amazonPurchases = [];
-purchases.forEach(page => {
-    let newYork = page.filter(items =>{
-        let location = items[1].text;
-        return (location.indexOf(' NY') != -1) ? true : false;
-    })
-    let amazon = page.filter(items => {
-        let location = items[1].text;
-        return (location.indexOf('AMAZON') != -1) ? true : false;
-    })
-    newYorkPurchases.push(newYork);
-    amazonPurchases.push(amazon);
-})
 
-let newYorkCost = 0;
-let amazonCost = 0;
-newYorkPurchases.forEach(page => {
-    page.forEach(items =>{
-        const date = items[0].text;
-        const loc = items[1].text;
-        const cost = Number(items[2].text);
-        console.log(`${date}  ${loc}  ${cost}`);
-        newYorkCost += cost;
+filterPurchases = (purchases, filter) => {
+    let filteredPurchases = [];
+    purchases.forEach(page => {
+        let filtered = page.filter(items =>{
+            let location = items[1].text;
+            return (location.indexOf(filter) != -1) ? true : false;
+        })
+        filteredPurchases.push(filtered);
     })
-})
+    return filteredPurchases;
+}
 
-amazonPurchases.forEach(page => {
-    page.forEach(items =>{
-        const date = items[0].text;
-        const loc = items[1].text;
-        const cost = Number(items[2].text);
-        console.log(`${date}  ${loc}  ${cost}`);
-        amazonCost += cost;
+newYorkCosts = (purchases) => {
+    const newYorkFilter = ' NY';
+    let newYorkPurchases = filterPurchases(purchases, newYorkFilter);
+    let newYorkCost = 0;
+
+    newYorkPurchases.forEach(page => {
+        page.forEach(items =>{
+            const date = items[0].text;
+            const loc = items[1].text;
+            const cost = Number(items[2].text);
+            console.log(`${date}  ${loc}  ${cost}`);
+            newYorkCost += cost;
+        })
+    }) 
+    console.log(`New York Cost: ${newYorkCost.toFixed(2)}`);
+    return newYorkCost;
+
+} 
+
+amazonCosts = (purchases) => {
+    const amazonFilter = 'AMAZON';
+    let amazonPurchases = filterPurchases(purchases, amazonFilter);
+    let amazonCost = 0;
+
+    amazonPurchases.forEach(page => {
+        page.forEach(items =>{
+            const date = items[0].text;
+            const loc = items[1].text;
+            const cost = Number(items[2].text);
+            console.log(`${date}  ${loc}  ${cost}`);
+            amazonCost += cost;
+        })
     })
-})
+    console.log(`Amazon Purchases: ${amazonCost.toFixed(2)}`)
+    return amazonCost;
+}
 
-console.log(`New York Cost: ${newYorkCost.toFixed(2)}`);
-console.log(`Amazon Purchases: ${amazonCost.toFixed(2)}`)
+const newYorkCost = newYorkCosts(purchases);
+const amazonCost = amazonCosts(purchases);
 let totalCost = newYorkCost + amazonCost;
 console.log(`Total Cost: ${totalCost.toFixed(2)}`)
