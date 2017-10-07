@@ -3,15 +3,20 @@ const hummus = require('hummus');
 const _ = require('lodash');
 const extractText = require('./lib/text-extraction');
 
-let parsePages = () => {
-    let fileToRun = './input/myFile.pdf';
+
+let pdfs = ['jan', 'feb', 'march', 'april', 'may', 'june', 'july', 'august', 'september'];
+
+
+let parsePages = (pdf) => {
+    let fileToRun = `./input/${pdf}.pdf`;
+    console.log(fileToRun);
     let pdfReader = hummus.createReader(fileToRun);
     let pagesPlacements = extractText(pdfReader);
     return pagesPlacements;
 }
-
+let month = pdfs[8]
 let pages = [];
-let parsedPages = parsePages();
+let parsedPages = parsePages(month);
 
 parsedPages.forEach((page, pageIndex) => {
     let groups = [];
