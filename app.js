@@ -4,67 +4,67 @@ const _ = require('lodash');
 const extractText = require('./lib/text-extraction');
 
 
-let pdfs = ['jan', 'feb', 'march', 'april', 'may', 'june', 'july', 'august', 'september'];
+const pdfs = ['jan', 'feb', 'march', 'april', 'may', 'june', 'july', 'august', 'september'];
 
-
-let parsePages = (pdf) => {
-    let fileToRun = `./input/${pdf}.pdf`;
-    let pdfReader = hummus.createReader(fileToRun);
-    let pagesPlacements = extractText(pdfReader);
-    return pagesPlacements;
-}
-
-let month = pdfs[7]
-let pages = [];
-let parsedPages = parsePages(month);
-
-parsedPages.forEach((page, pageIndex) => {
-    let groups = [];
-    if(page.length > 0){
-        let first = page.shift();
-        first.row = getRow(first);
-        let second = undefined;
-        page.forEach((item)=>{
-            if(item) {
-                item.row = getRow(item)
-                if (item.row == first.row) {
-                    if(second == undefined) second = item;
-                    else if(second.row == item.row){
-                        let group = [];
-                        group.push(first, second, item);
-                        groups.push(group);
+function PDFparser(month) {
+    let parsePages = (pdf) => {
+        let fileToRun = `./input/${pdf}.pdf`;
+        let pdfReader = hummus.createReader(fileToRun);
+        let pagesPlacements = extractText(pdfReader);
+        return pagesPlacements;
+    }
+    let pages = [];
+    let parsedPages = parsePages(month);
+    
+    parsedPages.forEach((page, pageIndex) => {
+        let groups = [];
+        if(page.length > 0){
+            let first = page.shift();
+            first.row = getRow(first);
+            let second = undefined;
+            page.forEach((item)=>{
+                if(item) {
+                    item.row = getRow(item)
+                    if (item.row == first.row) {
+                        if(second == undefined) second = item;
+                        else if(second.row == item.row){
+                            let group = [];
+                            group.push(first, second, item);
+                            groups.push(group);
+                            second = undefined;
+                        }
+                    } else {
+                        first = item;
                         second = undefined;
                     }
-                } else {
-                    first = item;
-                    second = undefined;
                 }
+            })
+            if (groups.length > 0){
+                let item = {
+                    page: pageIndex,
+                    groups
+                };
+                pages.push(item)
             }
-        })
-        if (groups.length > 0){
-            let item = {
-                page: pageIndex,
-                groups
-            };
-            pages.push(item)
         }
-    }
-})
-
-function getRow(item){
-    const matrix = item.matrix;
-    return matrix.pop();
-}
-
-let purchases = [];
-pages.forEach(page => {
-    let filtered = page.groups.filter((item, index, arr) =>{
-        let text = item[0].text;
-        let filter = (text.length != 5) ? false : true;
-        return filter; 
     })
-    if(filtered.length > 0) purchases.push(filtered);
-})
+    
+    function getRow(item){
+        const matrix = item.matrix;
+        return matrix.pop();
+    }
+    
+    let purchases = [];
+    pages.forEach(page => {
+        let filtered = page.groups.filter((item, index, arr) =>{
+            let text = item[0].text;
+            let filter = (text.length != 5) ? false : true;
+            return filter; 
+        })
+        if(filtered.length > 0) purchases.push(filtered);
+    })
+    return purchases;
+}
 
 filterPurchases = (purchases, filter) => {
     let filteredPurchases = [];
@@ -115,7 +115,24 @@ amazonCosts = (purchases) => {
     return amazonCost;
 }
 
-const newYorkCost = newYorkCosts(purchases);
-const amazonCost = amazonCosts(purchases);
-let totalCost = newYorkCost + amazonCost;
-console.log(`Total Cost: ${totalCost.toFixed(2)}`)
+
+
+((pdfs) => {
+    let totalCost = 0;
+    let amazonTotal = 0;
+    let newYorkTotal = 0;
+    let totalMonths = 0;
+    pdfs.forEach(month =>{
+        const purchases = PDFparser(month)
+        const newYorkCost = newYorkCosts(purchases);
+        const amazonCost = amazonCosts(purchases);
+        if (newYorkCost != 0) totalMonths +=1;
+        amazonTotal += amazonCost;
+        newYorkTotal += newYorkCost;
+        totalCost += newYorkCost + amazonCost;
+    })
+    console.log(`New York Total: ${newYorkTotal.toFixed(2)}`);
+    console.log(`Amazon Total: ${amazonTotal.toFixed(2)}`);
+    console.log(`Total Cost: ${totalCost.toFixed(2)}`);
+    console.log(`Average Cost Monthly: ${(totalCost.toFixed(2) /totalMonths).toFixed(2)}`);
+})(pdfs);
