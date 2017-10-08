@@ -1,3 +1,4 @@
+
 const fs = require('fs');
 const hummus = require('hummus');
 const _ = require('lodash');
@@ -6,7 +7,7 @@ const extractText = require('./lib/text-extraction');
 
 const pdfs = ['jan', 'feb', 'march', 'april', 'may', 'june', 'july', 'august', 'september'];
 
-function PDFparser(month) {
+function pdfParser(month) {
     let parsePages = (pdf) => {
         let fileToRun = `./input/${pdf}.pdf`;
         let pdfReader = hummus.createReader(fileToRun);
@@ -54,26 +55,25 @@ function PDFparser(month) {
         return matrix.pop();
     }
     
-    let purchases = [];
-    pages.forEach(page => {
+    let purchases = pages.filter(page => {
         let filtered = page.groups.filter((item, index, arr) =>{
             let text = item[0].text;
             let filter = (text.length != 5) ? false : true;
             return filter; 
         })
-        if(filtered.length > 0) purchases.push(filtered);
+        if(filtered.length > 0) return filtered;
+        else return false;
     })
     return purchases;
 }
 
 filterPurchases = (purchases, filter) => {
-    let filteredPurchases = [];
-    purchases.forEach(page => {
-        let filtered = page.filter(items =>{
+    let filteredPurchases = purchases.map(page => { 
+        let filtered = page.groups.filter(items =>{
             let location = items[1].text;
             return (location.indexOf(filter) != -1) ? true : false;
         })
-        filteredPurchases.push(filtered);
+        return filtered;
     })
     return filteredPurchases;
 }
@@ -83,7 +83,7 @@ newYorkCosts = (purchases) => {
     let newYorkPurchases = filterPurchases(purchases, newYorkFilter);
     let newYorkCost = 0;
 
-    newYorkPurchases.forEach(page => {
+    newYorkPurchases.forEach(page => { 
         page.forEach(items =>{
             const date = items[0].text;
             const loc = items[1].text;
@@ -123,7 +123,7 @@ amazonCosts = (purchases) => {
     let newYorkTotal = 0;
     let totalMonths = 0;
     pdfs.forEach(month =>{
-        const purchases = PDFparser(month)
+        const purchases = pdfParser(month)
         const newYorkCost = newYorkCosts(purchases);
         const amazonCost = amazonCosts(purchases);
         if (newYorkCost != 0) totalMonths +=1;
