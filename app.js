@@ -1,5 +1,3 @@
-
-const fs = require('fs');
 const hummus = require('hummus');
 const _ = require('lodash');
 const extractText = require('./lib/text-extraction');
@@ -29,8 +27,7 @@ function pdfParser(month) {
                     if (item.row == first.row) {
                         if(second == undefined) second = item;
                         else if(second.row == item.row){
-                            let group = [];
-                            group.push(first, second, item);
+                            let group = [first, second, item];
                             groups.push(group);
                             second = undefined;
                         }
@@ -41,7 +38,7 @@ function pdfParser(month) {
                 }
             })
             if (groups.length > 0){
-                let item = {
+                const item = {
                     page: pageIndex,
                     groups
                 };
@@ -114,8 +111,6 @@ amazonCosts = (purchases) => {
     console.log(`Amazon Purchases: ${amazonCost.toFixed(2)}`)
     return amazonCost;
 }
-
-
 
 ((pdfs) => {
     let totalCost = 0;
