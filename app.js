@@ -1,7 +1,7 @@
+console.time('perf')
 const hummus = require('hummus');
 const _ = require('lodash');
 const extractText = require('./lib/text-extraction');
-
 
 const pdfs = ['jan', 'feb', 'march', 'april', 'may', 'june', 'july', 'august', 'september'];
 
@@ -52,8 +52,8 @@ function pdfParser(month) {
         return matrix.pop();
     }
     
-    let purchases = pages.filter(page => {
-        let filtered = page.groups.filter((item, index, arr) =>{
+    let purchases = _.filter(pages, page => {
+        let filtered = _.filter(page.groups, (item, index, arr) =>{
             let text = item[0].text;
             let filter = (text.length != 5) ? false : true;
             return filter; 
@@ -65,8 +65,8 @@ function pdfParser(month) {
 }
 
 filterPurchases = (purchases, filter) => {
-    let filteredPurchases = purchases.map(page => { 
-        let filtered = page.groups.filter(items =>{
+    let filteredPurchases = _.map(purchases, page => { 
+        let filtered = _.filter(page.groups, items =>{
             let location = items[1].text;
             return (location.indexOf(filter) != -1) ? true : false;
         })
@@ -131,3 +131,4 @@ amazonCosts = (purchases) => {
     console.log(`Total Cost: ${totalCost.toFixed(2)}`);
     console.log(`Average Cost Monthly: ${(totalCost.toFixed(2) /totalMonths).toFixed(2)}`);
 })(pdfs);
+console.timeEnd('perf')
