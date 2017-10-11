@@ -6,14 +6,14 @@ const extractText = require('./lib/text-extraction');
 const pdfs = ['jan', 'feb', 'march', 'april', 'may', 'june', 'july', 'august', 'september'];
 
 function pdfParser(month) {
-    let parsePages = (pdf) => {
-        let fileToRun = `./input/${pdf}.pdf`;
-        let pdfReader = hummus.createReader(fileToRun);
-        let pagesPlacements = extractText(pdfReader);
-        return pagesPlacements;
+    const parsePages = (pdf) => {
+        const fileToRun = `./input/${pdf}.pdf`;
+        const pdfReader = hummus.createReader(fileToRun);
+        return pagesPlacements = extractText(pdfReader);
+        //return pagesPlacements;
     }
     let pages = [];
-    let parsedPages = parsePages(month);
+    const parsedPages = parsePages(month);
     
     parsedPages.forEach((page, pageIndex) => {
         let groups = [];
@@ -27,7 +27,7 @@ function pdfParser(month) {
                     if (item.row == first.row) {
                         if(second == undefined) second = item;
                         else if(second.row == item.row){
-                            let group = [first, second, item];
+                            const group = [first, second, item];
                             groups.push(group);
                             second = undefined;
                         }
@@ -52,7 +52,7 @@ function pdfParser(month) {
         return matrix.pop();
     }
     
-    let purchases = _.filter(pages, page => {
+    return purchases = _.filter(pages, page => {
         let filtered = _.filter(page.groups, (item, index, arr) =>{
             let text = item[0].text;
             let filter = (text.length != 5) ? false : true;
@@ -61,55 +61,28 @@ function pdfParser(month) {
         if(filtered.length > 0) return filtered;
         else return false;
     })
-    return purchases;
 }
 
-filterPurchases = (purchases, filter) => {
-    let filteredPurchases = _.map(purchases, page => { 
-        let filtered = _.filter(page.groups, items =>{
-            let location = items[1].text;
+const filterPurchases = (purchases, filter) => {
+    const filteredPurchases = _.map(purchases, page => { 
+        const filtered = _.filter(page.groups, items =>{
+            const location = items[1].text;
             return (location.indexOf(filter) != -1) ? true : false;
         })
         return filtered;
     })
-    return filteredPurchases;
+    return _.flatten(filteredPurchases);
 }
 
-newYorkCosts = (purchases) => {
-    const newYorkFilter = ' NY';
-    let newYorkPurchases = filterPurchases(purchases, newYorkFilter);
-    let newYorkCost = 0;
-
-    newYorkPurchases.forEach(page => { 
-        page.forEach(items =>{
-            const date = items[0].text;
-            const loc = items[1].text;
+const calcCosts = (purchases) => {
+    let total = 0;
+    if (purchases.length !=0) {
+        total =  _.reduce(purchases, (sum, items) =>{
             const cost = Number(items[2].text);
-            console.log(`${date}  ${loc}  ${cost}`);
-            newYorkCost += cost;
-        })
-    }) 
-    console.log(`New York Cost: ${newYorkCost.toFixed(2)}`);
-    return newYorkCost;
-
-} 
-
-amazonCosts = (purchases) => {
-    const amazonFilter = 'AMAZON';
-    let amazonPurchases = filterPurchases(purchases, amazonFilter);
-    let amazonCost = 0;
-
-    amazonPurchases.forEach(page => {
-        page.forEach(items =>{
-            const date = items[0].text;
-            const loc = items[1].text;
-            const cost = Number(items[2].text);
-            console.log(`${date}  ${loc}  ${cost}`);
-            amazonCost += cost;
-        })
-    })
-    console.log(`Amazon Purchases: ${amazonCost.toFixed(2)}`)
-    return amazonCost;
+            return sum += cost;
+        },total)   
+    }
+    return total;
 }
 
 ((pdfs) => {
@@ -119,8 +92,10 @@ amazonCosts = (purchases) => {
     let totalMonths = 0;
     pdfs.forEach(month =>{
         const purchases = pdfParser(month)
-        const newYorkCost = newYorkCosts(purchases);
-        const amazonCost = amazonCosts(purchases);
+        const newYorkPurchases = filterPurchases(purchases, ' NY');
+        const amazonPurchases = filterPurchases(purchases, 'AMAZON');
+        const newYorkCost = calcCosts(newYorkPurchases);
+        const amazonCost = calcCosts(amazonPurchases)
         if (newYorkCost != 0) totalMonths +=1;
         amazonTotal += amazonCost;
         newYorkTotal += newYorkCost;
