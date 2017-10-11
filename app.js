@@ -1,4 +1,3 @@
-console.time('perf')
 const hummus = require('hummus');
 const _ = require('lodash');
 const extractText = require('./lib/text-extraction');
@@ -10,11 +9,9 @@ function pdfParser(month) {
         const fileToRun = `./input/${pdf}.pdf`;
         const pdfReader = hummus.createReader(fileToRun);
         return pagesPlacements = extractText(pdfReader);
-        //return pagesPlacements;
     }
     let pages = [];
     const parsedPages = parsePages(month);
-    
     parsedPages.forEach((page, pageIndex) => {
         let groups = [];
         if(page.length > 0){
@@ -71,7 +68,7 @@ const filterPurchases = (purchases, filter) => {
         })
         return filtered;
     })
-    return _.flatten(filteredPurchases);
+    return filtered = _.flatten(filteredPurchases);
 }
 
 const calcCosts = (purchases) => {
@@ -106,4 +103,3 @@ const calcCosts = (purchases) => {
     console.log(`Total Cost: ${totalCost.toFixed(2)}`);
     console.log(`Average Cost Monthly: ${(totalCost.toFixed(2) /totalMonths).toFixed(2)}`);
 })(pdfs);
-console.timeEnd('perf')
