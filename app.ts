@@ -13,13 +13,14 @@ interface ExtractedRow {
 interface Math {
     sign(x:number):number
 }
+
 const hummus = require('hummus');
 const _ = require('lodash');
 const extractText = require('./lib/text-extraction');
 
 const pdfs = ['jan', 'feb', 'march', 'april', 'may', 'june', 'july', 'august', 'september'];
 
-function pdfParser(month:string) {
+const pdfParser = (month:string) : ExtractedRow[][][]=>{
     const parsePages = (pdf:string) :ExtractedRow[][] => {
         const fileToRun = `./input/${pdf}.pdf`;
         const pdfReader = hummus.createReader(fileToRun);
@@ -65,7 +66,7 @@ function pdfParser(month:string) {
     }
     
     return _.map(pages, page => {
-        const filtered = _.filter(page.groups, (item, index, arr) =>{
+        const filtered:ExtractedRow[][] = _.filter(page.groups, (item, index, arr) =>{
             const text = item[0].text;
             const filtered = (text.length != 5) ? false : true;
             return filtered; 
@@ -74,9 +75,9 @@ function pdfParser(month:string) {
     })
 }
 
-const filterPurchases = (purchases, filter = '') => {
-    const filteredPurchases = _.map(purchases, page => { 
-        const filtered = _.filter(page, items =>{
+const filterPurchases = (purchases:ExtractedRow[][][], filter = '') :ExtractedRow[][]=> {
+    const filteredPurchases:ExtractedRow[][][] = _.map(purchases, page => { 
+        const filtered:ExtractedRow[][] = _.filter(page, items =>{
             const location = items[1].text;
             return (location.indexOf(filter) != -1) ? true : false;
         })
@@ -85,12 +86,12 @@ const filterPurchases = (purchases, filter = '') => {
     return _.flatten(filteredPurchases);
 }
 
-const calcCosts = (purchases) => {
+const calcCosts = (purchases: ExtractedRow[][]) :number => {
     let total = 0;
     if (purchases.length !=0) {
-        total =  _.reduce(purchases, (sum, items) =>{
+        total =  _.reduce(purchases, (sum:number, items: ExtractedRow[]) =>{
             let cost = Number(items[2].text);
-            const text:string = items[1].text;
+            const text = items[1].text;
             if (Math.sign(cost) == -1) cost = filterPayments(text, cost);
             if (isNaN(cost)) cost = 0;
             return sum += cost;
@@ -99,7 +100,7 @@ const calcCosts = (purchases) => {
     return total;
 }
 
-const filterPayments = (item, cost) =>{
+const filterPayments = (item:string, cost:number):number =>{
     const text = item.toUpperCase();
     if (text.indexOf('PAYMENT') != -1) return cost;
     else return 0;

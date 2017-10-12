@@ -2,7 +2,7 @@ var hummus = require('hummus');
 var _ = require('lodash');
 var extractText = require('./lib/text-extraction');
 var pdfs = ['jan', 'feb', 'march', 'april', 'may', 'june', 'july', 'august', 'september'];
-function pdfParser(month) {
+var pdfParser = function (month) {
     var parsePages = function (pdf) {
         var fileToRun = "./input/" + pdf + ".pdf";
         var pdfReader = hummus.createReader(fileToRun);
@@ -56,7 +56,7 @@ function pdfParser(month) {
         if (filtered.length > 0)
             return filtered;
     });
-}
+};
 var filterPurchases = function (purchases, filter) {
     if (filter === void 0) { filter = ''; }
     var filteredPurchases = _.map(purchases, function (page) {
