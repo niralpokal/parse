@@ -1,127 +1,128 @@
-const hummus = require('hummus');
-const _ = require('lodash');
-const extractText = require('./lib/text-extraction');
-
-const pdfs = ['jan', 'feb', 'march', 'april', 'may', 'june', 'july', 'august', 'september'];
-
+var hummus = require('hummus');
+var _ = require('lodash');
+var extractText = require('./lib/text-extraction');
+var pdfs = ['jan', 'feb', 'march', 'april', 'may', 'june', 'july', 'august', 'september'];
 function pdfParser(month) {
-    const parsePages = (pdf) => {
-        const fileToRun = `./input/${pdf}.pdf`;
-        const pdfReader = hummus.createReader(fileToRun);
-        return pagesPlacements = extractText(pdfReader);
-    }
-    let pages = [];
-    const parsedPages = parsePages(month);
-    parsedPages.forEach((page, pageIndex) => {
-        let groups = [];
-        if(page.length > 0){
-            let first = page.shift();
-            first.row = getRow(first);
-            let second = undefined;
-            page.forEach((item)=>{
-                if(item) {
-                    item.row = getRow(item)
-                    if (item.row == first.row) {
-                        if(second == undefined) second = item;
-                        else if(second.row == item.row){
-                            const group = [first, second, item];
+    var parsePages = function (pdf) {
+        var fileToRun = "./input/" + pdf + ".pdf";
+        var pdfReader = hummus.createReader(fileToRun);
+        return extractText(pdfReader);
+    };
+    var pages = [];
+    var parsedPages = parsePages(month);
+    parsedPages.forEach(function (page, pageIndex) {
+        var groups = [];
+        if (page.length > 0) {
+            var first_1 = page.shift();
+            first_1.row = getRow(first_1);
+            var second_1 = undefined;
+            page.forEach(function (item) {
+                if (item) {
+                    item.row = getRow(item);
+                    if (item.row == first_1.row) {
+                        if (second_1 == undefined)
+                            second_1 = item;
+                        else if (second_1.row == item.row) {
+                            var group = [first_1, second_1, item];
                             groups.push(group);
-                            second = undefined;
+                            second_1 = undefined;
                         }
-                    } else {
-                        first = item;
-                        second = undefined;
+                    }
+                    else {
+                        first_1 = item;
+                        second_1 = undefined;
                     }
                 }
-            })
-            if (groups.length > 0){
-                const item = {
+            });
+            if (groups.length > 0) {
+                var item = {
                     page: pageIndex,
-                    groups
+                    groups: groups
                 };
-                pages.push(item)
+                pages.push(item);
             }
         }
-    })
-    
-    function getRow(item){
-        const matrix = item.matrix;
+    });
+    function getRow(item) {
+        var matrix = item.matrix;
         return matrix.pop();
     }
-    
-    return purchases = _.map(pages, page => {
-        const filtered = _.filter(page.groups, (item, index, arr) =>{
-            const text = item[0].text;
-            const filtered = (text.length != 5) ? false : true;
-            return filtered; 
-        })
-        if(filtered.length > 0) return filtered;
-    })
+    return _.map(pages, function (page) {
+        var filtered = _.filter(page.groups, function (item, index, arr) {
+            var text = item[0].text;
+            var filtered = (text.length != 5) ? false : true;
+            return filtered;
+        });
+        if (filtered.length > 0)
+            return filtered;
+    });
 }
-
-const filterPurchases = (purchases, filter = '') => {
-    const filteredPurchases = _.map(purchases, page => { 
-        const filtered = _.filter(page, items =>{
-            const location = items[1].text;
+var filterPurchases = function (purchases, filter) {
+    if (filter === void 0) { filter = ''; }
+    var filteredPurchases = _.map(purchases, function (page) {
+        var filtered = _.filter(page, function (items) {
+            var location = items[1].text;
             return (location.indexOf(filter) != -1) ? true : false;
-        })
+        });
         return filtered;
-    })
-    return filtered = _.flatten(filteredPurchases);
-}
-
-const calcCosts = (purchases) => {
-    let total = 0;
-    if (purchases.length !=0) {
-        total =  _.reduce(purchases, (sum, items) =>{
-            let cost = Number(items[2].text);
-            const text = items[1].text;
-            if (Math.sign(cost) == -1) cost = filterPayments(text, cost);
-            if (isNaN(cost)) cost = 0;
+    });
+    return _.flatten(filteredPurchases);
+};
+var calcCosts = function (purchases) {
+    var total = 0;
+    if (purchases.length != 0) {
+        total = _.reduce(purchases, function (sum, items) {
+            var cost = Number(items[2].text);
+            var text = items[1].text;
+            if (Math.sign(cost) == -1)
+                cost = filterPayments(text, cost);
+            if (isNaN(cost))
+                cost = 0;
             return sum += cost;
-        },total)   
+        }, total);
     }
     return total;
-}
-
-const filterPayments = (item, cost) =>{
-    const text = item.toUpperCase();
-    if (text.indexOf('PAYMENT') != -1) return cost;
-    else return 0;
-}
-
-((pdfs) => {
-    let totalCost = 0;
-    let amazonTotal = 0;
-    let newYorkTotal = 0;
-    let totalMonths = 0;
-    let filteredCost = 0;
-    let caliTotal = 0;
-    let newYorkMonths = 0;
-    pdfs.forEach(month =>{
-        const purchases = pdfParser(month)
-        const newYorkPurchases = filterPurchases(purchases, ' NY');
-        const amazonPurchases = filterPurchases(purchases, 'AMAZON');
-        const caliPurchases = filterPurchases(purchases, ' CA');
-        const totalPurchases = filterPurchases(purchases);
-        const newYorkCost = calcCosts(newYorkPurchases);
-        const amazonCost = calcCosts(amazonPurchases);
-        const purchaseCost = calcCosts(totalPurchases);
-        const caliCost = calcCosts(caliPurchases);
+};
+var filterPayments = function (item, cost) {
+    var text = item.toUpperCase();
+    if (text.indexOf('PAYMENT') != -1)
+        return cost;
+    else
+        return 0;
+};
+(function (pdfs) {
+    var totalCost = 0;
+    var amazonTotal = 0;
+    var newYorkTotal = 0;
+    var totalMonths = 0;
+    var filteredCost = 0;
+    var caliTotal = 0;
+    var newYorkMonths = 0;
+    pdfs.forEach(function (month) {
+        var purchases = pdfParser(month);
+        var newYorkPurchases = filterPurchases(purchases, ' NY');
+        var amazonPurchases = filterPurchases(purchases, 'AMAZON');
+        var caliPurchases = filterPurchases(purchases, ' CA');
+        var totalPurchases = filterPurchases(purchases);
+        var newYorkCost = calcCosts(newYorkPurchases);
+        var amazonCost = calcCosts(amazonPurchases);
+        var purchaseCost = calcCosts(totalPurchases);
+        var caliCost = calcCosts(caliPurchases);
         totalMonths += 1;
-        if(newYorkPurchases.length == 0) newYorkMonths += 1;
+        if (newYorkPurchases.length == 0)
+            newYorkMonths += 1;
         amazonTotal += amazonCost;
         newYorkTotal += newYorkCost;
         caliTotal += caliCost;
         filteredCost += newYorkCost + amazonCost;
         totalCost += purchaseCost;
-    })
-    console.log(`New York Total: ${newYorkTotal.toFixed(2)}`);
-    console.log(`Amazon Total: ${amazonTotal.toFixed(2)}`);
-    console.log(`Amazon + New York Cost: ${filteredCost.toFixed(2)}`)
-    console.log(`California Total: ${caliTotal.toFixed(2)}`)
-    console.log(`Total Cost: ${totalCost.toFixed(2)}`);
-    console.log(`Average Cost Monthly: ${(totalCost.toFixed(2) /totalMonths).toFixed(2)}`);
-    console.log(`Average Cali Cost Monthly: ${(caliTotal.toFixed(2) /totalMonths).toFixed(2)}`);
-    console.log(`Average New York Cost Monthly: ${(filteredCost.toFixed(2) /newYorkMonths).toFixed(2)}`);
+    });
+    console.log("New York Total: " + newYorkTotal.toFixed(2));
+    console.log("Amazon Total: " + amazonTotal.toFixed(2));
+    console.log("Amazon + New York Cost: " + filteredCost.toFixed(2));
+    console.log("California Total: " + caliTotal.toFixed(2));
+    console.log("Total Cost: " + totalCost.toFixed(2));
+    console.log("Average Cost Monthly: " + (totalCost / totalMonths).toFixed(2));
+    console.log("Average Cali Cost Monthly: " + (caliTotal / totalMonths).toFixed(2));
+    console.log("Average New York Cost Monthly: " + (filteredCost / newYorkMonths).toFixed(2));
 })(pdfs);
