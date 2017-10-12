@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        "outDir": "./",
+        "lib":[
+            "es2016",
+            "dom"
+        ],
+        "noImplicitAny": false,
+        "target": "es5"
+    }, 
+    "files": [
+        "./app.ts"
+    ]
+}
