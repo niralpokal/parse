@@ -49,20 +49,19 @@ function pdfParser(month) {
         return matrix.pop();
     }
     
-    return purchases = _.filter(pages, page => {
-        let filtered = _.filter(page.groups, (item, index, arr) =>{
-            let text = item[0].text;
-            let filter = (text.length != 5) ? false : true;
-            return filter; 
+    return purchases = _.map(pages, page => {
+        const filtered = _.filter(page.groups, (item, index, arr) =>{
+            const text = item[0].text;
+            const filtered = (text.length != 5) ? false : true;
+            return filtered; 
         })
         if(filtered.length > 0) return filtered;
-        else return false;
     })
 }
 
-const filterPurchases = (purchases, filter) => {
+const filterPurchases = (purchases, filter = '') => {
     const filteredPurchases = _.map(purchases, page => { 
-        const filtered = _.filter(page.groups, items =>{
+        const filtered = _.filter(page, items =>{
             const location = items[1].text;
             return (location.indexOf(filter) != -1) ? true : false;
         })
@@ -75,11 +74,20 @@ const calcCosts = (purchases) => {
     let total = 0;
     if (purchases.length !=0) {
         total =  _.reduce(purchases, (sum, items) =>{
-            const cost = Number(items[2].text);
+            let cost = Number(items[2].text);
+            const text = items[1].text;
+            if (Math.sign(cost) == -1) cost = filterPayments(text, cost);
+            if (isNaN(cost)) cost = 0;
             return sum += cost;
         },total)   
     }
     return total;
+}
+
+const filterPayments = (item, cost) =>{
+    const text = item.toUpperCase();
+    if (text.indexOf('PAYMENT') != -1) return cost;
+    else return 0;
 }
 
 ((pdfs) => {
@@ -87,19 +95,24 @@ const calcCosts = (purchases) => {
     let amazonTotal = 0;
     let newYorkTotal = 0;
     let totalMonths = 0;
+    let filteredCost = 0;
     pdfs.forEach(month =>{
         const purchases = pdfParser(month)
         const newYorkPurchases = filterPurchases(purchases, ' NY');
         const amazonPurchases = filterPurchases(purchases, 'AMAZON');
+        const totalPurchases = filterPurchases(purchases);
         const newYorkCost = calcCosts(newYorkPurchases);
-        const amazonCost = calcCosts(amazonPurchases)
-        if (newYorkCost != 0) totalMonths +=1;
+        const amazonCost = calcCosts(amazonPurchases);
+        const purchaseCost = calcCosts(totalPurchases);
+        totalMonths +=1;
         amazonTotal += amazonCost;
         newYorkTotal += newYorkCost;
-        totalCost += newYorkCost + amazonCost;
+        filteredCost += newYorkCost + amazonCost;
+        totalCost += purchaseCost;
     })
     console.log(`New York Total: ${newYorkTotal.toFixed(2)}`);
     console.log(`Amazon Total: ${amazonTotal.toFixed(2)}`);
+    console.log(`Amazon + New York Cost: ${filteredCost.toFixed(2)}`)
     console.log(`Total Cost: ${totalCost.toFixed(2)}`);
     console.log(`Average Cost Monthly: ${(totalCost.toFixed(2) /totalMonths).toFixed(2)}`);
 })(pdfs);
