@@ -96,23 +96,32 @@ const filterPayments = (item, cost) =>{
     let newYorkTotal = 0;
     let totalMonths = 0;
     let filteredCost = 0;
+    let caliTotal = 0;
+    let newYorkMonths = 0;
     pdfs.forEach(month =>{
         const purchases = pdfParser(month)
         const newYorkPurchases = filterPurchases(purchases, ' NY');
         const amazonPurchases = filterPurchases(purchases, 'AMAZON');
+        const caliPurchases = filterPurchases(purchases, ' CA');
         const totalPurchases = filterPurchases(purchases);
         const newYorkCost = calcCosts(newYorkPurchases);
         const amazonCost = calcCosts(amazonPurchases);
         const purchaseCost = calcCosts(totalPurchases);
-        totalMonths +=1;
+        const caliCost = calcCosts(caliPurchases);
+        totalMonths += 1;
+        if(newYorkPurchases.length == 0) newYorkMonths += 1;
         amazonTotal += amazonCost;
         newYorkTotal += newYorkCost;
+        caliTotal += caliCost;
         filteredCost += newYorkCost + amazonCost;
         totalCost += purchaseCost;
     })
     console.log(`New York Total: ${newYorkTotal.toFixed(2)}`);
     console.log(`Amazon Total: ${amazonTotal.toFixed(2)}`);
     console.log(`Amazon + New York Cost: ${filteredCost.toFixed(2)}`)
+    console.log(`California Total: ${caliTotal.toFixed(2)}`)
     console.log(`Total Cost: ${totalCost.toFixed(2)}`);
     console.log(`Average Cost Monthly: ${(totalCost.toFixed(2) /totalMonths).toFixed(2)}`);
+    console.log(`Average Cali Cost Monthly: ${(caliTotal.toFixed(2) /totalMonths).toFixed(2)}`);
+    console.log(`Average New York Cost Monthly: ${(filteredCost.toFixed(2) /newYorkMonths).toFixed(2)}`);
 })(pdfs);
