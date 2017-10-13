@@ -10,8 +10,11 @@ app.get('/', function (req, res) {
     res.send();
 });
 app.get('/month', function (req, res) {
-    console.log(req.body);
-    res.send();
+    var month = req.query.month;
+    var pages;
+    if (month)
+        pages = pdfParser(month);
+    res.json(pages);
 });
 var pdfs = ['jan', 'feb', 'march', 'april', 'may', 'june', 'july', 'august', 'september'];
 var pdfParser = function (month) {
