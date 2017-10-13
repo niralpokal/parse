@@ -18,6 +18,7 @@
     "@angular/platform-browser": "^4.2.4",
     "@angular/platform-browser-dynamic": "^4.2.4",
     "@angular/router": "^4.2.4",
+    "@types/express": "^4.0.37",
     "core-js": "^2.4.1",
     "express": "^4.16.2",
     "hummus-recipe": "^1.2.5",
