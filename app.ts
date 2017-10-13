@@ -1,22 +1,9 @@
-declare function require(name:string)
-interface parsedPage {
-    page: number,
-    groups: ExtractedRow[][]
-}
-interface ExtractedRow {
-    text:string,
-    row?:number,
-    matrix: [number],
-    localBBox: [number],
-    globalBBox: [number]
-}
-interface Math {
-    sign(x:number):number
-}
-
+const express = require('express');
 const hummus = require('hummus');
 const _ = require('lodash');
 const extractText = require('./lib/text-extraction');
+const app = express();
+import { parsedPage, ExtractedRow, Math } from './models';
 
 const pdfs = ['jan', 'feb', 'march', 'april', 'may', 'june', 'july', 'august', 'september'];
 

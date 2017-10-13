@@ -1,6 +1,10 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var express = require('express');
 var hummus = require('hummus');
 var _ = require('lodash');
 var extractText = require('./lib/text-extraction');
+var app = express();
 var pdfs = ['jan', 'feb', 'march', 'april', 'may', 'june', 'july', 'august', 'september'];
 var pdfParser = function (month) {
     var parsePages = function (pdf) {
