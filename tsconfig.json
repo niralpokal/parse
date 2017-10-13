@@ -1,17 +1,19 @@
 {
-    "compilerOptions": {
-        "outDir": "./",
-        "lib":[
-            "es2016",
-            "dom"
-        ],
-        "noImplicitAny": false,
-        "target": "es5"
-    }, 
-    "files": [
-        "app.ts"
+  "compileOnSave": false,
+  "compilerOptions": {
+    "outDir": "./dist/out-tsc",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "target": "es5",
+    "typeRoots": [
+      "node_modules/@types"
     ],
-    "exclude": [
-        "**/*.interface.ts"
+    "lib": [
+      "es2017",
+      "dom"
     ]
+  }
 }
