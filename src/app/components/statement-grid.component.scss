@@ -1,0 +1,19 @@
+.grid {
+    display: block;
+    margin: 0 0 3em 0;
+    padding: 0;   
+}
+.grid-cell {
+    box-sizing: border-box;
+    width: 33%;
+    padding: 0.8em 1.2em;
+    overflow: hidden;
+    list-style: none;
+    border: solid 3px white;
+    align-self: auto;
+}
+.grid-row {
+    display: flex;
+    flex-flow: wrap row; 
+    justify-content: space-around;
+}
