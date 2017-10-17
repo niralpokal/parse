@@ -20,17 +20,17 @@ import { Component } from '@angular/core';
 export class StatementGridComponent {
     headings = ['Date', 'Location', 'Amount']
     gridItems = [{
-        date: new Date(),
+        date: '01/22',
         location: 'NY',
         amount: '107.23'
     },
     {
-        date: new Date(),
+        date: '01/22',
         location: 'NY',
         amount: '107.23'
     },
     {
-        date: new Date(),
+        date: '01/22',
         location: 'NY',
         amount: '107.23'
     }]
