@@ -1,5 +1,5 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
+exports.__esModule = true;
 var express = require('express');
 var hummus = require('hummus');
 var _ = require('lodash');
@@ -11,10 +11,13 @@ app.get('/', function (req, res) {
 });
 app.get('/month', function (req, res) {
     var month = req.query.month;
-    var pages;
-    if (month)
-        pages = pdfParser(month);
-    res.json(pages);
+    var valid = pdfs.indexOf(month);
+    if (month && valid != -1) {
+        var pages = pdfParser(month);
+        res.jsonp(pages);
+    }
+    else
+        res.sendStatus(404);
 });
 var pdfs = ['jan', 'feb', 'march', 'april', 'may', 'june', 'july', 'august', 'september'];
 var pdfParser = function (month) {

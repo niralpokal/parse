@@ -12,11 +12,12 @@ app.get('/', (req, res)=>{
 
 app.get('/month', (req, res) =>{
     const month = req.query.month;
-    if (month) {
+    const valid = pdfs.indexOf(month);
+    if (month && valid != -1) {
         const pages = pdfParser(month);
-        res.json(pages);
+        res.jsonp(pages);
     } 
-    else res.send();
+    else res.sendStatus(404);
 })
 
 const pdfs = ['jan', 'feb', 'march', 'april', 'may', 'june', 'july', 'august', 'september'];
